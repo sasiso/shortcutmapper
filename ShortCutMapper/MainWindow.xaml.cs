@@ -28,26 +28,16 @@ namespace ShortCutMapper
             return databse.read(path);
         }
 
-        void OnButtonClick(Data d, Object sender, MouseButtonEventArgs e)
+        void HandleRightClick(Data d, Object sender, MouseButtonEventArgs e)
         {
 
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = d.Path;
-                process.StartInfo = startInfo;
-                process.Start();
-            }
-            else
+            if (e.RightButton == MouseButtonState.Pressed)
             {
                 IDatabase db = new DB_Xml("");
                 d.Path = "";
                 db.save(d);
                 this.reload();
-
-            }            
+            }           
         } 
 
         Button createButton(Data d)
@@ -57,6 +47,7 @@ namespace ShortCutMapper
             
             b.Height = 80;
             b.Width = 40;
+            
 
             int pos = d.Path.LastIndexOf("\\");
             var title = pos != -1 ? d.Path.Substring(pos + 1) : d.Path;
@@ -71,8 +62,11 @@ namespace ShortCutMapper
 
 
             
-            MouseButtonEventHandler handler = (s, e) => OnButtonClick(d, s, e);
+            MouseButtonEventHandler handler = (s, e) => HandleRightClick(d, s, e);
             b.MouseDown += handler;
+
+            RoutedEventHandler onClick= (s, e) => HandleLeftClick(d, s, e);
+            b.Click += onClick;
 
 
 
@@ -178,6 +172,11 @@ namespace ShortCutMapper
             databse.save(d);
 
             createButton(d);
+        }
+
+        private void HandleLeftClick(Data d, object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", d.Path);            
         }
     }
 }
